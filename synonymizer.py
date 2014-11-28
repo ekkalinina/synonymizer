@@ -9,15 +9,15 @@ import re#nltk
 class Synonymizer:
 	def __init__(self):
 		self.morph = pymorphy2.MorphAnalyzer()
-		self.con = MySQLdb.connect(host="localhost", user="user", passwd="123456", db="test", charset = "utf8")
+		self.con = MySQLdb.connect(host="localhost", user="root", passwd="newpass", db="nlp", charset = "utf8")
 		self.cur = self.con.cursor()
 		self.cur.execute('SET NAMES utf8')
-		self.lexmin_list = self.load_lexmin_list('C:\Users\kalin_000\Desktop\synonymizer_lite\data\lexmin.txt')
-		self.similarity_dict = self.load_similarity_dict('C:\Users\kalin_000\Desktop\synonymizer_lite\data\similarity.txt')
-		self.word_freq_list = self.load_word_freq_list('C:\Users\kalin_000\Desktop\synonymizer_lite\data\word_freq.txt')
-		self.yarn_synonyms = self.load_yarn_synonyms('C:\Users\kalin_000\Desktop\synonymizer_lite\data\yarn.xml')
+		self.lexmin_list = self.load_lexmin_list('data\lexmin.txt')
+		self.similarity_dict = self.load_similarity_dict('data\similarity.txt')
+		self.word_freq_list = self.load_word_freq_list('data\word_freq.txt')
+		self.yarn_synonyms = self.load_yarn_synonyms('data\yarn.xml')
 		print "Initialized"
-		
+
 	def __del__(self):
 		self.con.close()
 	
@@ -29,7 +29,7 @@ class Synonymizer:
 			lexmin_list.add(word)
 		f.close()
 		return lexmin_list
-		
+
 	def is_lexmin(self, word):	
 		return word in self.lexmin_list
 			
@@ -120,7 +120,7 @@ class Synonymizer:
 		#(synonymizer and yarn), similarity_dict and word_freq_list
 		ranged_syns = []
 		for syn in syns:
-			weight = int(self.get_word_freq(syn)) / float(self.get_similarity_rate(word, syn))
+			weight = int(self.get_word_freq(syn)) * float(self.get_similarity_rate(word, syn))
 			ranged_syns.append((syn, weight))	
 		ranged_syns.sort(key=self.sort_by_weight, reverse=True)	
 		return ranged_syns
@@ -131,8 +131,11 @@ class Synonymizer:
 		#text_items = [word for word in nltk.WordPunctTokenizer().tokenize(text.lower()) if word not in punctlist]
 		text_items = re.split(r'[\s+\t\n\.\|\:\;\-\/\,\?\!\"\'()]+', text.lower())
 		for word in text_items:
-			norm_form = self.morph.parse(word)[0].normal_form
-			syns = self.get_synonyms(norm_form)
-			syns = self.filter_synonyms(norm_form, syns)
-			synonyms.append((word, self.range_synonyms(norm_form,syns)))
+			try:
+				norm_form = self.morph.parse(word)[0].normal_form
+				syns = self.get_synonyms(norm_form)
+				syns = self.filter_synonyms(norm_form, syns)
+				synonyms.append((word, self.range_synonyms(norm_form,syns)))
+			except:
+				pass
 		return synonyms
