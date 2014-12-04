@@ -1,14 +1,11 @@
 ﻿# -*- coding: utf-8 -*-
 
 import codecs
-import pymorphy2 # may use table clear_forms
 import MySQLdb
 import xml.etree.ElementTree as ET
-import re#nltk
 
 class Synonymizer:
 	def __init__(self):
-		self.morph = pymorphy2.MorphAnalyzer()
 		self.con = MySQLdb.connect(host="localhost", user="root", passwd="newpass", db="nlp", charset = "utf8")
 		self.cur = self.con.cursor()
 		self.cur.execute('SET NAMES utf8')
@@ -125,17 +122,9 @@ class Synonymizer:
 		ranged_syns.sort(key=self.sort_by_weight, reverse=True)	
 		return ranged_syns
 	
-	def synonymize(self, text):
-		synonyms= []
-		#punctlist = set(['.', ',', '|', ':', ';', '-', '/', '\\', '?', '!', '"', '\'', '(', ')'])
-		#text_items = [word for word in nltk.WordPunctTokenizer().tokenize(text.lower()) if word not in punctlist]
-		text_items = re.split(r'[\s+\t\n\.\|\:\;\-\/\,\?\!\"\'()]+', text.lower())
-		for word in text_items:
-			try:
-				norm_form = self.morph.parse(word)[0].normal_form
-				syns = self.get_synonyms(norm_form)
-				syns = self.filter_synonyms(norm_form, syns)
-				synonyms.append((word, self.range_synonyms(norm_form,syns)))
-			except:
-				pass
-		return synonyms
+	def need_replace(self, word, best_syn):
+		#assume: similarity_rate_word_with_itself = similarity_rate_word_with_the_best_synonym
+		return not self.is_lexmin(word) or not self.get_word_freq(word) or self.get_word_freq(best_syn)>self.get_word_freq(word)
+	
+	def synonymize(self, word):	
+		return self.range_synonyms(word, self.filter_synonyms(word, self.get_synonyms(word)))
