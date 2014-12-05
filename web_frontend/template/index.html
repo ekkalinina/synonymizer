@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<title>Синонимайзер русских текстов</title>
+	<meta http-equiv="Content-type" content="text/html; charset=windows-1251"/>
+	<link rel="stylesheet" type="text/css" href="./template/libs/style.css" />
+	<script type="text/javascript" src="./template/libs/jquery-1.2.6.js"></script>
+	<script type="text/javascript" src="./template/libs/ui.js"></script>
+</head>
+<body>
+	<div style="width: 800px;margin: auto;">
+	<div class="head">
+	<h1>Синонимайзер русских текстов</h1>
+	</div>
+	<p>
+		После начальной синонимизации, можно редактировать сделанные замены:
+		<ul>
+			<li><b><em>click</em></b> &#151; подбор других синонимов</li>
+			<li><b><em>ctr + click</em></b> &#151; удаление замены</li>
+			<li><b><em>ctr + shift + click</em></b> &#151; удаление замены и связи из базы</li>
+		</ul>
+	</p>
+	<textarea class="text"></textarea>
+	<button class="changeText">Синонимизировать</button> <small class="loading">Loading...</small>
+	<p class="changedText"></p>
+</body>
+</html>
